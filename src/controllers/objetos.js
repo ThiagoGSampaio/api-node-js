@@ -3,10 +3,19 @@ const db = require('../database/connection');
 module.exports = {
     async listarObjetos(request, response) {
         try {
+
+            const sql = `
+              SELECT obj_id, categ_id, usu_id, obj_descricao, obj_foto, obj_local_encontrado, obj_data_publicacao, obj_status, obj_encontrado = 1 AS usu_ativo
+              FROM objetos;  
+            `;
+
+            const [rows] = await db.query(sql);
+        
             return response.status(200).json({
                 sucesso: true, 
                 mensagem: 'Lista de objetos', 
-                dados: null
+                itens: rows.lenght,
+                dados: rows,
             });
         } catch (error) {
             return response.status(500).json({
