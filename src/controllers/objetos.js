@@ -70,12 +70,40 @@ module.exports = {
             });
         }
     }, 
+
+
     async editarObjetos(request, response) {
         try {
+
+            const { categ_id, usu_id, obj_descricao, obj_foto, obj_local_encontrado, obj_data_publicacao, obj_status, obj_encontrado, } = request.body
+            const { obj_id } = request.params;
+
+            const sql = `
+                UPDATE objetos SET 
+                    categ_id = ?, usu_id = ?, obj_descricao = ?, obj_foto = ?, obj_local_encontrado = ?, obj_data_publicacao = ?, obj_status = ?, obj_encontrado = ?
+                WHERE
+                    obj_id = ?;
+            `;
+
+            const values = [categ_id, usu_id, obj_descricao, obj_foto, obj_local_encontrado, obj_data_publicacao, obj_status, obj_encontrado, obj_id];
+            const [result] = await db.query(sql, values);
+
+            if (result.affectedRows === 0 ) {
+                return response.status(404).json({
+                    sucesso: false,
+                    mensagem: `Obejto ${obj_id} não encontrado`,
+                    dados: null
+                });
+            }
+
+            const dados = {
+                obj_id, categ_id, usu_id, obj_descricao, obj_foto, obj_local_encontrado, obj_data_publicacao, obj_status, obj_encontrado
+            };
+
             return response.status(200).json({
                 sucesso: true, 
-                mensagem: 'Alteração no cadastro de objetos', 
-                dados: null
+                mensagem: `Objeto ${obj_id} atualizado com sucesso`, 
+                dados
             });
         } catch (error) {
             return response.status(500).json({
@@ -85,6 +113,9 @@ module.exports = {
             });
         }
     }, 
+
+
+
     async apagarObjetos(request, response) {
         try {
             return response.status(200).json({
